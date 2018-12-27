@@ -111,6 +111,41 @@ public class DatabaseClusterImpl<Z, D extends Database<Z>> implements DatabaseCl
 		}
 	}
 
+	//Custom
+	@ManagedAttribute
+	public String getSourceModifiedBy()
+	{
+		return "Fresh";
+	}
+	
+	@ManagedAttribute
+	public String getPrimaryInfos()
+	{
+	  String msg = "";
+	  msg = msg + "id: " + balancer.primary().getId();
+	  msg = msg + " | location: " + balancer.primary().getLocation();
+	  return msg;
+	}
+	
+	@ManagedAttribute
+	public String getSynchronizationListeners()
+	{
+	  String ret = "";
+	  for (SynchronizationListener currSyncListener : synchronizationListeners) {
+		ret = ret + currSyncListener.toString();
+	  }
+	  return ret;
+	}
+
+	@ManagedOperation
+	public void testLogging()
+	{
+		logger.log(Level.DEBUG, "msg 1/3: JMX testLogging() -> Level.DEBUG, via [runtime logger]"); 
+		logger.log(Level.ERROR, "msg 2/3: JMX testLogging() -> Level.ERROR, via [runtime logger]"); 
+		System.err.println("msg 3/3: JMX testLogging() -> via System.err.println()"); 
+	}
+	// end custom -------------------
+
 	/**
 	 * Deactivates the specified database.
 	 * @param databaseId a database identifier
@@ -119,6 +154,7 @@ public class DatabaseClusterImpl<Z, D extends Database<Z>> implements DatabaseCl
 	@ManagedOperation
 	public void deactivate(String databaseId)
 	{
+		logger.log(Level.DEBUG, "JMX @ deactivate(String databaseId) -> databaseId = " + databaseId);
 		this.deactivate(this.getDatabase(databaseId), this.stateManager);
 	}
 
@@ -131,6 +167,7 @@ public class DatabaseClusterImpl<Z, D extends Database<Z>> implements DatabaseCl
 	@ManagedOperation
 	public void activate(String databaseId)
 	{
+		logger.log(Level.DEBUG, "JMX @ activate(String databaseId) -> databaseId = " + databaseId);
 		this.activate(databaseId, this.configuration.getDefaultSynchronizationStrategy());
 	}
 
@@ -190,6 +227,7 @@ public class DatabaseClusterImpl<Z, D extends Database<Z>> implements DatabaseCl
 	@ManagedOperation
 	public boolean isAlive(String databaseId)
 	{
+		logger.log(Level.DEBUG, "JMX @ isAlive(String databaseId) -> databaseId = " + databaseId);
 		return this.isAlive(this.getDatabase(databaseId), Level.WARN);
 	}
 	
@@ -456,6 +494,7 @@ public class DatabaseClusterImpl<Z, D extends Database<Z>> implements DatabaseCl
 	public boolean deactivate(D database, StateManager manager)
 	{
 		boolean removed = this.balancer.remove(database);
+		logger.log(Level.DEBUG, "@ deactivate(D database, StateManager manager) : database = '" + database + "', removed = '" + removed + "'");
 		
 		if (removed)
 		{
@@ -879,7 +918,9 @@ public class DatabaseClusterImpl<Z, D extends Database<Z>> implements DatabaseCl
 					
 					for (SynchronizationListener listener: this.synchronizationListeners)
 					{
+						logger.log(Level.DEBUG, "@ activate() | beforeSynchronization(event: '" + event.toString() + "') -> starting..");
 						listener.beforeSynchronization(event);
+						logger.log(Level.DEBUG, "@ activate() | beforeSynchronization(event: '" + event.toString() + "') -> ..done.");
 					}
 					
 					strategy.synchronize(context);
@@ -888,7 +929,9 @@ public class DatabaseClusterImpl<Z, D extends Database<Z>> implements DatabaseCl
 					
 					for (SynchronizationListener listener: this.synchronizationListeners)
 					{
+						logger.log(Level.DEBUG, "@ activate() | afterSynchronization(event: '" + event.toString() + "') -> starting..");
 						listener.afterSynchronization(event);
+						logger.log(Level.DEBUG, "@ activate() | afterSynchronization(event: '" + event.toString() + "') -> ..done.");
 					}
 				}
 				finally

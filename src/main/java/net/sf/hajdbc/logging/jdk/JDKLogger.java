@@ -67,6 +67,7 @@ public class JDKLogger extends AbstractLogger
 			{
 				this.logger.log(realLevel, message);
 			}
+			System.err.println("ICT_debug:\t - \t" + message);
 		}
 	}
 }

@@ -17,7 +17,10 @@
  */
 package net.sf.hajdbc.logging;
 
+import java.util.Map;
 import java.util.ServiceLoader;
+
+import net.sf.hajdbc.logging.slf4j.SLF4JLoggingProvider;
 
 /**
  * Factory for creating {@link Logger} implementation from various logging service provider implementations.
@@ -27,14 +30,57 @@ public final class LoggerFactory
 {
 	private static final LoggingProvider provider = getProvider();
 
+	private static String getPrefLoggerClassName(){
+		String ret = "";
+		Map<String, String> env = null;
+		try {
+			env = System.getenv();
+			String prefLoggerClassName = env.get("ICT_HAJDBC_PREF_LOGGER_CLASSNAME");
+
+			if (prefLoggerClassName != null && !prefLoggerClassName.equals("")){
+				ret = prefLoggerClassName;
+			}
+		}catch(Exception e){ 
+			/// something wrong, e.g. 'SecurityException' depending of security manager configuration
+			ret = "";
+		}
+		return ret;
+	}
+
 	private static LoggingProvider getProvider()
 	{
+		String prefLogger = getPrefLoggerClassName();
+		if (prefLogger != null && !prefLogger.equals("")){
+			LoggingProvider providerPref = null;
+			System.out.println("ICT_debug: Env var ICT_HAJDBC_PREF_LOGGER_CLASSNAME = " + prefLogger);
+			if (prefLogger.equals("net.sf.hajdbc.logging.jboss.JBossLoggingProvider")){
+				providerPref = new net.sf.hajdbc.logging.jboss.JBossLoggingProvider();
+			}
+			else 
+			if (prefLogger.equals("net.sf.hajdbc.logging.slf4j.SLF4JLoggingProvider")){
+				providerPref = new net.sf.hajdbc.logging.slf4j.SLF4JLoggingProvider();
+			}
+			else 
+			if (prefLogger.equals("net.sf.hajdbc.logging.commons.CommonsLoggingProvider")){
+				providerPref = new net.sf.hajdbc.logging.commons.CommonsLoggingProvider();
+			}
+			else 
+			if (prefLogger.equals("net.sf.hajdbc.logging.jdk.JDKLoggingProvider")){
+				providerPref = new net.sf.hajdbc.logging.jdk.JDKLoggingProvider();
+			}
+			if (providerPref != null){
+				System.out.println("ICT_debug: Using preferred logger: " + providerPref.getName());
+				return providerPref;
+			}
+		}
+
 		for (LoggingProvider provider: ServiceLoader.load(LoggingProvider.class, LoggingProvider.class.getClassLoader()))
 		{
 			if (provider.isEnabled())
 			{
 				provider.getLogger(LoggerFactory.class).log(Level.DEBUG, "Using {0} logging", provider.getName());
 				
+				System.err.println("ICT_debug: Using " + provider.getName() + " logging");
 				return provider;
 			}
 		}

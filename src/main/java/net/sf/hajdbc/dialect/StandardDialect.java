@@ -522,12 +522,14 @@ public class StandardDialect implements Dialect, SequenceSupport, IdentityColumn
 	{
 		if ((e instanceof SQLNonTransientConnectionException) || (e instanceof SQLTransientConnectionException))
 		{
+			System.err.println("ICT_debug:: @ indicatesFailure(SQLException e) -> SQLNonTransientConnectionException || SQLTransientConnectionException");
 			return true;
 		}
 		
 		String sqlState = e.getSQLState();
 		if ((sqlState != null) && this.indicatesFailure(sqlState))
 		{
+			System.err.println("ICT_debug:: @ indicatesFailure(SQLException e), sqlState = " + sqlState);
 			return true;
 		}
 		
