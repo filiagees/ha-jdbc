@@ -39,6 +39,10 @@
 	<properties>
 		<github.site.repositoryName>ha-jdbc.github.com</github.site.repositoryName>
 		<github.site.repositoryOwner>ha-jdbc</github.site.repositoryOwner>
+
+		<!-- https://github.com/spring-guides/gs-maven/issues/21  -->
+		<maven.compiler.source>1.8</maven.compiler.source>
+    	<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
 	<repositories>
@@ -63,6 +67,40 @@
 	</pluginRepositories>
 
 	<dependencies>
+
+		<!-- TEST: trying to build (22/06/2020) -->
+		<!-- see: 
+		- https://github.com/openaudible/openaudible/pull/148 -->
+
+		<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.2.12</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-core -->
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+			<version>2.2.10</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl -->
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.2.11</version>
+		</dependency>
+
+<!-- see: https://stackoverflow.com/questions/8186395/noclassdeffounderror-javax-activation-datasource -->
+<!-- https://mvnrepository.com/artifact/javax.activation/activation  -->
+<dependency>
+    <groupId>javax.activation</groupId>
+    <artifactId>activation</artifactId>
+    <version>1.1.1</version>
+</dependency>
+
+
+
 		<!-- Optional distributable provider dependencies -->
 		<dependency>
 			<groupId>org.jgroups</groupId>
@@ -168,7 +206,7 @@
 				<configuration>
 					<rules>
 						<requireJavaVersion>
-							<version>1.7</version>
+							<version>1.8</version>
 						</requireJavaVersion>
 					</rules>
 				</configuration>
@@ -185,8 +223,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
